@@ -31,20 +31,20 @@ public class PointlessSleep {
 
         private char executorThreadName = 'a';
 
-        private final ArrayBlockingQueue<SleepTask> jobQueue = new ArrayBlockingQueue<>(30);
+        private final ArrayBlockingQueue<SleepTask> taskQueue = new ArrayBlockingQueue<>(30);
         private final ExecutorService executorService = new ScheduledThreadPoolExecutor(4, runnable -> {
             return new Thread(runnable, String.valueOf(executorThreadName++));  // cheeky way of naming threads 'a', 'b', 'c', ...
         });
 
         public void addTask(SleepTask task) throws InterruptedException {
             log("> enqueueing task %d", task.id);
-            this.jobQueue.put(task);
+            this.taskQueue.put(task);
         }
 
         public void manage() {
             while (true) {
                 try {
-                    SleepTask task = jobQueue.take();
+                    SleepTask task = taskQueue.take();
                     log("> dequeueing task %d", task.id);
                     this.executorService.submit(task);
                 } catch (InterruptedException ignored) { }
